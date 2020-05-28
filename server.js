@@ -18,4 +18,13 @@ if(cluster.isMaster){
 		console.log(`Lets fork new worker!");
 		cluster.fork();
 	});
+} else {
+	const app = express();
+	app.get("/", (req, res) => {
+		console.log(`Worker Process ID - ${cluster.worker.process.pid} has accepted the request!`);
+		let number = fabObj.calculateFibonacciValue(Number.parseInt(req.query.number));
+		res.send(`<h1>${number}</h1>`);
+	});
+	
+	app.listen(3000, () => console.log("Express App is running on PORT : 3000"));
 }
