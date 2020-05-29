@@ -2,7 +2,7 @@ const express = require("express");
 const cluster = require("cluster");
 const totalCPUs = require('os').cpus().length;
 
-const fabObj = require("./math-logic/fibonacci-series");
+const fabObj = require("./math-logic/fibonacci");
 if (cluster.isMaster) {
 
 	console.log(`Total Number of CPU Counts is ${totalCPUs}`);
