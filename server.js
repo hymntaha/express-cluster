@@ -1,30 +1,13 @@
 const express = require("express");
-const cluster = require("cluster");
-const totalCPUs = require('os').cpus().length;
 
-const fabObj = require("./math-logic/fibonacci");
-if (cluster.isMaster) {
+const fabObj = require("./math-logic/fibonacci-series");
+const app = express();
 
-	console.log(`Total Number of CPU Counts is ${totalCPUs}`);
+//http://localhost:3000?number=10
+app.get("/", (request, response) => {
+	console.log(`Worker ID is - ${process.pid}`);
+	let number = fabObj.calculateFibonacciValue(Number.parseInt(request.query.number));
+	response.send(`<h1>${number}</h1>`);
+});
 
-	for (var i = 0; i < totalCPUs; i++) {
-		cluster.fork();
-	}
-	cluster.on("online", worker => {
-		console.log(`Worker Id is ${worker.id} and PID is ${worker.process.pid}`);
-	});
-	cluster.on("exit", worker => {
-		console.log(`Worker Id ${worker.id} and PID is ${worker.process.pid} is offline`);
-		console.log("Let's fork new worker!");
-		cluster.fork();
-	});
-}
-else {
-	const app = express();
-	app.get("/", (request, response) => {
-		console.log(`Worker Process Id - ${cluster.worker.process.pid} has accepted the request!`);
-		let number = fabObj.calculateFibonacciValue(Number.parseInt(request.query.number));
-		response.send(`<h1>${number}</h1>`);
-	});
-
-	app.listen(3000, () => console.log("Express App is running on PORT : 3000"));
+app.listen(3000, () => console.log("Express App is running on PORT : 3000"));
